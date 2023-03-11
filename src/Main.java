@@ -1,14 +1,22 @@
-import static java.lang.Math.round;
+import static java.lang.Math.floor;
 
 public class Main {
     public static void main(String[] args) {
         Mortgage mortgage = new Mortgage();
 
-        mortgage.setYearInterest(3.3);
-        mortgage.setHomeValue(400000);
-        mortgage.setLoanTerm(25);
-        mortgage.setDownPayment(50000);
+        double interest = 5;
+        double homeVal = 300000;
+        int loanTerm = 30;
+        mortgage.setYearInterest(interest);
+        mortgage.setHomeValue(homeVal);
+        mortgage.setLoanTerm(loanTerm);
+        mortgage.setDownPayment(20000);
 
-        System.out.println(round(mortgage.calculateMonthlyPaymentAnual()) );
+        System.out.println("Interest rate : "+  interest + " |home value : "+ homeVal + "|Loan term : "+ loanTerm);
+
+        mortgage.printMonthlyPaymentsAnnuity();
+        mortgage.printMonthlyPaymentsLinear();
+
     }
+
 }

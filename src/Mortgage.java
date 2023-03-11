@@ -1,4 +1,5 @@
-import static java.lang.Math.pow;
+import static java.lang.Math.*;
+
 /*
     Pageidaujama paskolos suma (galimas skaičius ir su kalbeliu). +
     Paskolos terminas (metai ir mėnesiai). +
@@ -6,21 +7,22 @@ import static java.lang.Math.pow;
     Metinis procentas +
  */
 public class Mortgage {
-    boolean isAnual = true;
     private double homeValue;
     private double downPayment;
 
     private double loan;
-    private double yearInterestRate;
-    private int loanTerm; // in years; devided by 100
+    private double yearInterestRate; // devided by 100
+    private int loanTerm; // in years;
 
-    final int months = 12;
+    private double monthlyInterestRate;
+    final int months = 12;  //constant value
 
     Mortgage( ){
 
     }
     public void setYearInterest(double yearInterestRateIn){
         this.yearInterestRate = yearInterestRateIn / 100;
+        this.monthlyInterestRate = this.yearInterestRate / months;
     }
 
     public void setDownPayment(double downPaymentIn){ this.downPayment = downPaymentIn; }
@@ -34,19 +36,59 @@ public class Mortgage {
 
     public double getYearInterestRate(){ return this.yearInterestRate; }
 
-    public double calculateMonthlyPaymentAnual(){
+    private double calculateMonthlyPaymentAnnuity(){
         this.loan = this.homeValue - this.downPayment; // Principal (starting balance) of the loan
 
-        double monthlyInterestRate = this.yearInterestRate / months;
+        //double monthlyInterestRate = this.yearInterestRate / months;
         int numOfPayments = this.loanTerm * months;
-        double temp = pow((1 + monthlyInterestRate), numOfPayments);
+        double temp = pow((1 + this.monthlyInterestRate), numOfPayments);
 
-        double payment = ((monthlyInterestRate * temp ) / (temp - 1)) * this.loan;
+        double payment = ((this.monthlyInterestRate * temp ) / (temp - 1)) * this.loan;
 
         return payment;
     }
 
+    public void printMonthlyPaymentsAnnuity(){
+        double mokejimoSuma = calculateMonthlyPaymentAnnuity();
+        float annuityPirce = 0;
+        double paskolosLikutis = this.loan;
+        double palukanuDalis;
+        double paskolosDalis;
+       // System.out.printf("Mėnuo | Paskolos likutis | Mokėjimo suma | Paskolos dalis | Palūkanų dalis %n");
+        for(int i = 0; i < this.loanTerm * months; ++i){
+            palukanuDalis = myRoundToCents(paskolosLikutis * this.monthlyInterestRate);
+            paskolosDalis = myRoundToCents(mokejimoSuma - palukanuDalis);
+            paskolosLikutis = myRoundToCents(paskolosLikutis);
+           // System.out.printf("%-5d | %-16.2f | %-13.2f | %-14.2f | %-14.2f %n", i + 1,paskolosLikutis,mokejimoSuma,paskolosDalis,palukanuDalis);
 
+            paskolosLikutis -= paskolosDalis;
+            annuityPirce += mokejimoSuma;
+
+        }
+        System.out.println("Kaina anuiteto " + annuityPirce);
+
+    }
+
+    public void printMonthlyPaymentsLinear(){
+        float linearprice = 0;
+        double loanBalance = this.loan; // paskolos likutis
+        double monthlyPayment = myRoundToCents(this.loan / (this.loanTerm * months)) ;
+
+        //System.out.printf("Mėnuo | Paskolos likutis | Mokėjimo suma | Paskolos dalis | Palūkanų dalis %n");
+
+        for(int i = 0 ; i < this.loanTerm * months; ++i){
+            double interest = myRoundToCents(loanBalance * this.monthlyInterestRate) ;
+           // System.out.printf("%-5d | %-16.2f | %-13.2f | %-14.2f | %-14.2f %n", i + 1,loanBalance,monthlyPayment + interest,monthlyPayment,interest);
+            loanBalance -= monthlyPayment;
+
+            linearprice += monthlyPayment + interest;
+        }
+        System.out.println("Kaina linijinio " + linearprice);
+
+    }
+    private static double myRoundToCents(double number){
+        return floor(number * 100) / 100;
+    }
 
 }
 
